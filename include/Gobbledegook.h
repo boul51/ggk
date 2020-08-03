@@ -55,6 +55,9 @@
 
 #pragma once
 
+#include <stdint.h>
+#include <vector>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -210,7 +213,7 @@ extern "C"
 	//
 	//     Retrieve this value using the `getAdvertisingShortName()` method
 	//
-	int ggkStart(const char *pServiceName, const char *pAdvertisingName, const char *pAdvertisingShortName, 
+    int ggkStart(const char *pServiceName, const std::vector<uint8_t>& advertisingData,
 		GGKServerDataGetter getter, GGKServerDataSetter setter, int maxAsyncInitTimeoutMS);
 
 	// Blocks for up to maxAsyncInitTimeoutMS milliseconds until the server shuts down.

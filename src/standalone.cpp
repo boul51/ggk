@@ -96,6 +96,7 @@
 #include <iostream>
 #include <thread>
 #include <sstream>
+#include <vector>
 
 #include "../include/Gobbledegook.h"
 
@@ -235,6 +236,35 @@ int dataSetter(const char *pName, const void *pData)
 	return 0;
 }
 
+static std::vector<uint8_t> forgeIBeaconData() {
+    std::vector<uint8_t> data;
+
+    uint8_t uuid[] = {0x6E, 0x65, 0x77, 0x69, 0x73, 0x20, 0x42, 0x52, 0x44, 0x20, 0x62, 0x65, 0x61, 0x63, 0x6F, 0x6E};
+    std::size_t uuidSize = sizeof(uuid);
+    uint16_t major = 5133;
+    uint16_t minor = 51966;
+    uint8_t rssi = 0xC8;
+
+    data.push_back(0); // size, will be set later
+    data.push_back(0xFF); // type 'manufacturer data'
+    data.push_back(0x4C); // manufacturer Apple
+    data.push_back(0x00); // manufacturer Apple
+    data.push_back(0x02); // ibeacon type: iBeacon
+    data.push_back(0x15); // ibeacon length
+
+    std::copy(&uuid[0], &uuid[uuidSize], std::back_inserter(data));
+
+    data.push_back((major & 0xFF00) >> 8); // major MSB
+    data.push_back((major & 0x00FF) >> 0); // major LSB
+    data.push_back((minor & 0xFF00) >> 8); // minor MSB
+    data.push_back((minor & 0x00FF) >> 0); // minor LSB
+    data.push_back(rssi); // tx power level
+
+    data[0] = data.size() - 1;
+
+    return data;
+}
+
 //
 // Entry point
 //
@@ -289,7 +319,9 @@ int main(int argc, char **ppArgv)
 	//     This first parameter (the service name) must match tha name configured in the D-Bus permissions. See the Readme.md file
 	//     for more information.
 	//
-	if (!ggkStart("gobbledegook", "Gobbledegook", "Gobbledegook", dataGetter, dataSetter, kMaxAsyncInitTimeoutMS))
+	std::vector<uint8_t> advertisingData = forgeIBeaconData();
+
+	if (!ggkStart("gobbledegook", advertisingData, dataGetter, dataSetter, kMaxAsyncInitTimeoutMS))
 	{
 		return -1;
 	}

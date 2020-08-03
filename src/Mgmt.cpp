@@ -188,9 +188,67 @@ bool Mgmt::setLE(bool newState)
 // 2 = enabled in connectable mode).
 //
 // Returns true on success, otherwise false
-bool Mgmt::setAdvertising(uint8_t newState)
+bool Mgmt::setAdvertising(uint8_t newState, const std::vector<uint8_t>& advertisingData)
 {
-	return setState(Mgmt::ESetAdvertisingCommand, controllerIndex, newState);
+	if (!newState)
+	{
+		struct SRequest : HciAdapter::HciHeader
+		{
+			uint8_t  instance;
+		} __attribute__((packed));
+
+		SRequest request;
+		request.code = Mgmt::ERemoveAdvertisingCommand;
+		request.controllerId = controllerIndex;
+		request.dataSize = sizeof(SRequest) - sizeof(HciAdapter::HciHeader);
+		request.instance = 1u;
+
+		if (!HciAdapter::getInstance().sendCommand(request))
+		{
+			Logger::warn(SSTR << "  + Failed to remove advertising");
+			return false;
+		}
+	}
+	else
+	{
+		struct SRequest : HciAdapter::HciHeader
+		{
+			uint8_t  instance;
+			uint32_t flags;
+			uint16_t duration;
+			uint16_t timeout;
+			uint8_t  advDataLen;
+			uint8_t  scanRspLen;
+            uint8_t  data[kMaxAdvertisingDataLen];
+		} __attribute__((packed));
+
+        if (advertisingData.size() > kMaxAdvertisingDataLen)
+		{
+			Logger::error(SSTR << "  + Advertising data are too long");
+			return false;
+		}
+
+		SRequest request;
+		request.code = Mgmt::EAddAdvertisingCommand;
+		request.controllerId = controllerIndex;
+		request.dataSize = sizeof(SRequest) - sizeof(HciAdapter::HciHeader);
+		request.instance = 1u;
+		request.flags = 3u; // Connectable && Discoverable, see Bluez/lib/mgmt.h
+		request.duration = 0;
+		request.timeout = 0;
+		request.scanRspLen = 0;
+		request.advDataLen = advertisingData.size();
+
+		std::copy(advertisingData.cbegin(), advertisingData.cend(), request.data);
+
+		if (!HciAdapter::getInstance().sendCommand(request))
+		{
+			Logger::warn(SSTR << "  + Failed to add advertising");
+			return false;
+		}
+	}
+
+	return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------------

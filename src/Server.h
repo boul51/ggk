@@ -89,26 +89,8 @@ struct Server
 	// Returns our registered data setter
 	GGKServerDataSetter getDataSetter() const { return dataSetter; }
 
-	// advertisingName: The name for this controller, as advertised over LE
-	//
-	// This is set from the constructor.
-	//
-	// IMPORTANT: Setting the advertisingName will change the system-wide name of the device. If that's not what you want, set
-	// BOTH advertisingName and advertisingShortName to as empty string ("") to prevent setting the advertising
-	// name.
-	const std::string &getAdvertisingName() const { return advertisingName; }
-
-	// advertisingShortName: The short name for this controller, as advertised over LE
-	//
-	// According to the spec, the short name is used in case the full name doesn't fit within Extended Inquiry Response (EIR) or
-	// Advertising Data (AD).
-	//
-	// This is set from the constructor.
-	//
-	// IMPORTANT: Setting the advertisingName will change the system-wide name of the device. If that's not what you want, set
-	// BOTH advertisingName and advertisingShortName to as empty string ("") to prevent setting the advertising
-	// name.
-	const std::string &getAdvertisingShortName() const { return advertisingShortName; }
+	// Returns our advertising data
+	const std::vector<uint8_t> &getAdvertisingData() const { return advertisingData; }
 
 	// serviceName: The name of our server (collectino of services)
 	//
@@ -139,26 +121,8 @@ struct Server
 	//
 	//     Retrieve this value using the `getName()` method.
 	//
-	// advertisingName: The name for this controller, as advertised over LE
-	//
-	//     IMPORTANT: Setting the advertisingName will change the system-wide name of the device. If that's not what you want, set
-	//     BOTH advertisingName and advertisingShortName to as empty string ("") to prevent setting the advertising
-	//     name.
-	//
-	//     Retrieve this value using the `getAdvertisingName()` method.
-	//
-	// advertisingShortName: The short name for this controller, as advertised over LE
-	//
-	//     According to the spec, the short name is used in case the full name doesn't fit within Extended Inquiry Response (EIR) or
-	//     Advertising Data (AD).
-	//
-	//     IMPORTANT: Setting the advertisingName will change the system-wide name of the device. If that's not what you want, set
-	//     BOTH advertisingName and advertisingShortName to as empty string ("") to prevent setting the advertising
-	//     name.
-	//
-	//     Retrieve this value using the `getAdvertisingShortName()` method.
-	//
-	Server(const std::string &serviceName, const std::string &advertisingName, const std::string &advertisingShortName, 
+	// advertisingData: The data to be written into the advertising frame
+	Server(const std::string &serviceName, const std::vector<uint8_t>& advertisingData,
 		GGKServerDataGetter getter, GGKServerDataSetter setter);
 
 	//
@@ -209,26 +173,8 @@ private:
 	// The setter callback that is responsible for storing current server data that is shared over Bluetooth
 	GGKServerDataSetter dataSetter;
 
-	// advertisingName: The name for this controller, as advertised over LE
-	//
-	// This is set from the constructor.
-	//
-	// IMPORTANT: Setting the advertisingName will change the system-wide name of the device. If that's not what you want, set
-	// BOTH advertisingName and advertisingShortName to as empty string ("") to prevent setting the advertising
-	// name.
-	std::string advertisingName;
-
-	// advertisingShortName: The short name for this controller, as advertised over LE
-	//
-	// According to the spec, the short name is used in case the full name doesn't fit within Extended Inquiry Response (EIR) or
-	// Advertising Data (AD).
-	//
-	// This is set from the constructor.
-	//
-	// IMPORTANT: Setting the advertisingName will change the system-wide name of the device. If that's not what you want, set
-	// BOTH advertisingName and advertisingShortName to as empty string ("") to prevent setting the advertising
-	// name.
-	std::string advertisingShortName;
+	// Advertising frame data
+	std::vector<uint8_t> advertisingData;
 
 	// serviceName: The name of our server (collectino of services)
 	//

@@ -282,6 +282,9 @@ void uninit()
 // This method is non-blocking and as such, will only trigger the shutdown process but not wait for it
 void shutdown()
 {
+	Mgmt mgmt;
+	mgmt.setAdvertising(0);
+
 	if (ggkGetServerRunState() > ERunning)
 	{
 		Logger::warn("Ignoring call to shutdown (we are already shutting down)");
@@ -672,8 +675,6 @@ void configureAdapter()
 	Mgmt mgmt;
 
 	// Get our properly truncated advertising names
-	std::string advertisingName = Mgmt::truncateName(TheServer->getAdvertisingName());
-	std::string advertisingShortName = Mgmt::truncateShortName(TheServer->getAdvertisingShortName());
 
 	// Find out what our current settings are
 	HciAdapter::ControllerInformation info = HciAdapter::getInstance().getControllerInformation();
@@ -687,10 +688,9 @@ void configureAdapter()
 	bool cnFlag = info.currentSettings.isSet(HciAdapter::EHciConnectable) == TheServer->getEnableConnectable();
 	bool diFlag = info.currentSettings.isSet(HciAdapter::EHciDiscoverable) == TheServer->getEnableDiscoverable();
 	bool adFlag = info.currentSettings.isSet(HciAdapter::EHciAdvertising) == TheServer->getEnableAdvertising();
-	bool anFlag = (advertisingName.length() == 0 || advertisingName == info.name) && (advertisingShortName.length() == 0 || advertisingShortName == info.shortName);
 
 	// If everything is setup already, we're done
-	if (!pwFlag || !leFlag || !brFlag || !scFlag || !bnFlag || !cnFlag || !diFlag || !adFlag || !anFlag)
+	if (!pwFlag || !leFlag || !brFlag || !scFlag || !bnFlag || !cnFlag || !diFlag || !adFlag)
 	{
 		// We need it off to start with
 		if (pwFlag)
@@ -744,17 +744,11 @@ void configureAdapter()
 		}
 
 		// Change the Advertising state?
-		if (!adFlag)
+		// Always call that if advertising is enabled to overwrite advertising data
+		if (!adFlag || TheServer->getEnableAdvertising())
 		{
 			Logger::debug(SSTR << (TheServer->getEnableAdvertising() ? "Enabling":"Disabling") << " Advertising");
-			if (!mgmt.setAdvertising(TheServer->getEnableAdvertising() ? 1 : 0)) { setRetry(); return; }
-		}
-
-		// Set the name?
-		if (!anFlag)
-		{
-			Logger::info(SSTR << "Setting advertising name to '" << advertisingName << "' (with short name: '" << advertisingShortName << "')");
-			if (!mgmt.setName(advertisingName.c_str(), advertisingShortName.c_str())) { setRetry(); return; }
+			if (!mgmt.setAdvertising(TheServer->getEnableAdvertising() ? 1 : 0, TheServer->getAdvertisingData())) { setRetry(); return; }
 		}
 
 		// Turn it back on

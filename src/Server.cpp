@@ -216,14 +216,14 @@ std::shared_ptr<Server> TheServer = nullptr;
 //
 //     Retrieve this value using the `getAdvertisingShortName()` method.
 //
-Server::Server(const std::string &serviceName, const std::string &advertisingName, const std::string &advertisingShortName, 
+Server::Server(const std::string &serviceName, const std::vector<uint8_t>& advertisingData,
 	GGKServerDataGetter getter, GGKServerDataSetter setter)
 {
 	// Save our names
 	this->serviceName = serviceName;
 	std::transform(this->serviceName.begin(), this->serviceName.end(), this->serviceName.begin(), ::tolower);
-	this->advertisingName = advertisingName;
-	this->advertisingShortName = advertisingShortName;
+	this->advertisingData = advertisingData;
+
 
 	// Register getter & setter for server data
 	dataGetter = getter;
@@ -234,8 +234,8 @@ Server::Server(const std::string &serviceName, const std::string &advertisingNam
 	enableSecureConnection = false;
 	enableConnectable = true;
 	enableDiscoverable = true;
-	enableAdvertising = true;
 	enableBondable = false;
+	enableAdvertising = advertisingData.size() > 0;
 
 	//
 	// Define the server

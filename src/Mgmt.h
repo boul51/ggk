@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 #include "HciAdapter.h"
 #include "Utils.h"
@@ -44,6 +45,9 @@ struct Mgmt
 
 	// The length of the controller's short name (not including null terminator)
 	static const int kMaxAdvertisingShortNameLength = 10;
+
+	// The maximum size of data present in an advertising frame
+	static const int kMaxAdvertisingDataLen = 32;
 
 	//
 	// Types
@@ -228,7 +232,7 @@ struct Mgmt
 	// 2 = enabled in connectable mode).
 	//
 	// Returns true on success, otherwise false
-	bool setAdvertising(uint8_t newState);
+	bool setAdvertising(uint8_t newState, const std::vector<uint8_t>& advertisingData = std::vector<uint8_t>{});
 
 	//
 	// Utilitarian
