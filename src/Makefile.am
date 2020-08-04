@@ -1,7 +1,8 @@
-# Build a static library (libggk.a)
-noinst_LIBRARIES = libggk.a
-libggk_a_CXXFLAGS = -fPIC -Wall -Wextra -std=c++11 $(GLIB_CFLAGS) $(GIO_CFLAGS) $(GOBJECT_CFLAGS)
-libggk_a_SOURCES = DBusInterface.cpp \
+# Build a static library (libggk.la)
+lib_LTLIBRARIES = libggk.la
+libggk_la_CXXFLAGS = -fPIC -Wall -Wextra -std=c++11 $(GLIB_CFLAGS) $(GIO_CFLAGS) $(GOBJECT_CFLAGS)
+libggk_la_LDFLAGS = -module
+libggk_la_SOURCES = DBusInterface.cpp \
                    DBusInterface.h \
                    DBusMethod.cpp \
                    DBusMethod.h \
@@ -44,5 +45,5 @@ libggk_a_SOURCES = DBusInterface.cpp \
 standalone_CXXFLAGS = -fPIC -Wall -Wextra -std=c++11
 noinst_PROGRAMS = standalone
 standalone_SOURCES = standalone.cpp
-standalone_LDADD = libggk.a
+standalone_LDADD = libggk.la
 standalone_LDLIBS = $(GLIB_LIBS) $(GIO_LIBS) $(GOBJECT_LIBS)

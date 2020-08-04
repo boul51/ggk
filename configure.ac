@@ -8,9 +8,9 @@ AC_CHECK_LIB([glib-2.0], g_variant_new, [], [AC_MSG_ERROR([glib-2.0 library not 
 AC_CHECK_LIB([gio-2.0], g_dbus_method_invocation_return_dbus_error, [], [AC_MSG_ERROR([gio-2.0 library not found])])
 AC_CHECK_LIB([gobject-2.0], g_object_unref, [], [AC_MSG_ERROR([gobject-2.0 library not found])])
 AX_CXX_COMPILE_STDCXX(11)
-AC_PROG_RANLIB
-AC_PROG_CXX
 AM_PROG_AR
+LT_INIT
+AC_PROG_CXX
 
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GIO_CFLAGS)
