@@ -1,0 +1,24 @@
+In order to build this library, you need to:
+
+1. Call the environment setup script for your target (optional, not needed on desktop)
+e.g.:
+. /opt/poky/2.0.1/environment-setup-cortexa9hf-vfp-neon-poky-linux-gnueabi
+
+2. Generate the configure script
+autoreconf --install
+(You may need to install autoconf, automake and additional packages for that)
+
+3. Launch configure
+For desktop:
+./configure
+(configure script may ask you to install some additional packages, go ahead)
+
+For target;
+./configure --host=arm-linux
+
+4. Launch make
+make
+(The libraries are generated in src/.libs)
+
+5. Install the package (optional, desktop only: should not be used on target where the lib should be installed in your SDK)
+sudo make install
